@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:200" rel="stylesheet">
+    <title>MetaHash Smart Home</title>
+
+    <style>
+        body {
+            font-family: 'Work Sans';
+        }
+
+        #main {
+            display: flex;
+            flex-direction: row;
+            height: 60vmin;
+            padding-left: 100px;
+            padding-right: 100px;
+            padding-top: 100px;
+        }
+
+        .block {
+            flex-grow: 1;
+            flex-basis: 0;
+            margin: 2vw;
+            color: #fff;
+            text-align: center;
+            position: relative;
+
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .block-title {
+            font-size: 3vw;
+            margin-top: 100px;
+        }
+
+        .block-body {
+            font-size: 5vw;
+            margin-top: 50px;
+        }
+
+
+        .temp-mid {
+            background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+
+        .gradient {
+            border-radius: 10px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -100;
+            transition: opacity 1s;
+        }
+
+        .heater-on {
+            background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+        }
+
+        .heater-off {
+            background: #C9CCD3;
+            background-image: linear-gradient(-180deg, rgba(255, 255, 255, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%);
+            background-blend-mode: lighten;
+        }
+
+        .co-ok {
+            background-image: linear-gradient(to top, #37ecba 0%, #72afd3 100%);
+        }
+
+        .co-warn {
+            background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);
+        }
+
+
+        #logo {
+            text-align: center;
+        }
+
+        #logo img {
+            max-height: 90px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var heaterBlock = document.getElementById("heater");
+            heaterBlock.addEventListener("click", function switchHeaterState() {
+                heaterIsOn = !heaterIsOn;
+                heaterBlock.getElementsByClassName("heater-off")[0].style.opacity = heaterIsOn ? 0 : 1;
+                var body = heaterBlock.getElementsByClassName("block-body")[0];
+                body.innerText = heaterIsOn ? "ON" : "OFF";
+            });
+
+            function setBlockValue(blockId, value) {
+                document.getElementById(blockId).getElementsByClassName("block-body")[0].innerHTML = value;
+            }
+
+            function setHeaterGradient(heaterText) {
+                var opacity = heaterText == "True" ? 0 : 1
+                document.getElementById("heater").getElementsByClassName("heater-off")[0].style.opacity = opacity;
+
+            }
+
+            function setCoGradient(coText) {
+                var opacity = +coText < 100 ? 0 : 1
+                document.getElementById("co").getElementsByClassName("co-warn")[0].style.opacity = opacity;
+
+            }
+
+            function fetchTemp() {
+                fetch('temp')
+                    .then(function (response) {
+                        if (response.status == 200) {
+                            response.text().then(function (tempText) {
+                                setBlockValue("temp", tempText + "&deg;C");
+                            });
+                        }
+                    })
+            }
+
+            function fetchCo() {
+                fetch('co')
+                    .then(function (response) {
+                        if (response.status == 200) {
+                            response.text().then(function (coText) {
+                                setCoGradient(coText);
+                                setBlockValue("co", coText + "PPM");
+                            });
+                        }
+                    })
+            }
+
+            function fetchHeater() {
+                fetch('heater')
+                    .then(function (response) {
+                        if (response.status == 200) {
+                            response.text().then(function (heaterText) {
+                                setHeaterGradient(heaterText);
+                                setBlockValue("heater", heaterText == "True" ? "ON" : "OFF");
+                            });
+                        }
+                    })
+            }
+
+            setInterval(function () {
+                /*coLevel += Math.random() * 2 - 1;
+                console.log(coLevel)
+                var coBlock = document.getElementById("co");
+                coBlock.getElementsByClassName("block-body")[0].innerText = ~~coLevel + "PPM";*/
+                fetchTemp();
+                fetchCo();
+                fetchHeater();
+            }, 1000);
+        });
+
+    </script>
+</head>
+
+<body>
+    <div id="main">
+        <div id="temp" class="block">
+            <div class="gradient temp-mid"></div>
+            <div class="block-title">Temperature</div>
+            <div class="block-body">20&deg;C</div>
+        </div>
+        <div id="co" class="block">
+            <div class="gradient co-ok"></div>
+            <div class="gradient co-warn"></div>
+            <div class="block-title">CO level</div>
+            <div class="block-body">100PPM</div>
+        </div>
+        <div id="heater" class="block">
+            <div class="gradient heater-on"></div>
+            <div class="gradient heater-off"></div>
+            <div class="block-title ">Heater</div>
+            <div class="block-body ">OFF</div>
+        </div>
+    </div>
+    <div id="logo">
+        <img src="metahash_logo.png">
+    </div>
+</body>
+
+</html>
