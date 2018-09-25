@@ -1,1 +1,1 @@
-![](CryptoBazar_v1.pdf)
+![](CryptoBazar_v1/index.html)
