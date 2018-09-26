@@ -1,7 +1,6 @@
 import subprocess
 from fabulous.color import bold, blue, green
 import time
-import requests
 import random
 
 import mhutils

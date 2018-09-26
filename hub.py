@@ -1,5 +1,4 @@
 import subprocess
-import requests
 from fabulous.color import bold, blue, green
 from flask import Flask
 import time
@@ -38,6 +37,7 @@ Thread(target=background).start()
 
 
 app = Flask(__name__, static_url_path='')
+app.__static_folder = 'static'
 
 
 @app.route('/')
