@@ -18,4 +18,5 @@ docker build -t metahash_smarthome .
 docker run --network="host" metahash_smarthome
 ```
 
-### 3. OPen the web interface on `http://localhost:5000`
+### 3. Oen the web interface
+Open `http://localhost:5000` in your browser
