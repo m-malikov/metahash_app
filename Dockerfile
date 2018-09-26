@@ -9,7 +9,6 @@ ADD co.py /
 ADD heater.py /
 ADD keys /keys
 ADD static /static
-ADD run.sh /
 
 RUN apt-get update -y
 RUN apt-get install -y python3 python3-pip dnsutils xxd
