@@ -6,9 +6,14 @@
 ![](CryptoBazar/CryptoBazarImg/CryptoBazarImg.006.jpeg)
 ![](CryptoBazar/CryptoBazarImg/CryptoBazarImg.007.jpeg)
 
-## Running the app
+## Follow this algorithm to run and test our App with console.
 
-### 1. Build the app
+### 0. Download this repository from the github.
+```
+git clone https://github.com/m-malikov/metahash_app.git
+```
+And go to the folder /metahash_app (`cd metahash_app`)
+### 1. Build the app (it can take time)
 ```
 docker build -t metahash_smarthome .
 ```
@@ -18,5 +23,5 @@ docker build -t metahash_smarthome .
 docker run --network="host" metahash_smarthome
 ```
 
-### 3. Oen the web interface
+### 3. Open the Web interface
 Open `http://localhost:5000` in your browser
