@@ -28,3 +28,17 @@ def get_last_data_from_address(history, address):
     transactions = filter(lambda x: x["from"] == address, history)
     last_transaction = max(transactions, key=lambda x: x["timestamp"])
     return bytes.fromhex(last_transaction["data"]).decode('utf-8')
+
+
+def send_transaction(pubkey, privkey, value, to, data):
+    return subprocess.check_output(
+        "python3",
+        "metahash.py",
+        "send-tx",
+        "--net=test",
+        "--pubkey=" + pubkey,
+        "--privkey=" + privkey,
+        "--value=" + str(value),
+        "--to=" + to,
+        '--data=' + str(data)
+    ).decode('utf-8')

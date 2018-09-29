@@ -1,18 +1,19 @@
 import subprocess
-from fabulous.color import bold, blue, green
 import time
 import random
-
+from pprint import pprint
 import mhutils
+import json
+import serial
 
 hub_address = mhutils.get_address("keys/hub.pub")
-
-temp = 20
+usb_input = serial.Serial('???', 9600)
 
 while True:
-    temp += (random.random() - 0.5)
-    print(bold("Current temperature:"), green("{:.1f}".format(temp)))
-
+    # data = json.dumps(
+    #    {"temp": "22.5", "humidity": "100", "soil": "50"})
+    data = usb_input.readline().decode('utf-8')
+    pprint(json.loads(data))
     transaction_result = subprocess.check_output([
         "python3",
         "metahash.py",
@@ -22,7 +23,7 @@ while True:
         "--privkey=keys/temp.priv",
         "--value=1",
         "--to={}".format(hub_address),
-        '--data=' + "{:.1f}".format(temp)
+        '--data=' + data
     ]).decode("utf-8")
     print(transaction_result)
     time.sleep(5)

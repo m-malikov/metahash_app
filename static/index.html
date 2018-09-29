@@ -8,16 +8,17 @@
 
     <style>
         body {
+            padding-top: 50px;
             font-family: 'Work Sans';
         }
 
-        #main {
+        .block_row {
             display: flex;
             flex-direction: row;
-            height: 60vmin;
+            height: 40vmin;
             padding-left: 100px;
             padding-right: 100px;
-            padding-top: 100px;
+            padding-top: 2vw;
         }
 
         .block {
@@ -38,12 +39,12 @@
 
         .block-title {
             font-size: 3vw;
-            margin-top: 100px;
+            margin-top: 5vh;
         }
 
         .block-body {
             font-size: 5vw;
-            margin-top: 50px;
+            margin-top: 5vh;
         }
 
 
@@ -60,24 +61,37 @@
             transition: opacity 1s;
         }
 
-        .heater-on {
+        .heater-on,
+        .light-on {
             background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
         }
 
-        .heater-off {
+        .heater-off,
+        .light-off {
             background: #C9CCD3;
             background-image: linear-gradient(-180deg, rgba(255, 255, 255, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%);
             background-blend-mode: lighten;
         }
 
-        .co-ok {
+        .co-ok,
+        .soil-ok {
             background-image: linear-gradient(to top, #37ecba 0%, #72afd3 100%);
         }
 
-        .co-warn {
+        .co-warn,
+        .soil-warn {
             background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);
         }
 
+        .door-open {
+            background-image: linear-gradient(60deg, #29323c 0%, #485563 100%);
+        }
+
+        .door-closed {
+            background: #C9CCD3;
+            background-image: linear-gradient(-180deg, rgba(255, 255, 255, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%);
+            background-blend-mode: lighten;
+        }
 
         #logo {
             text-align: center;
@@ -90,14 +104,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            var heaterBlock = document.getElementById("heater");
-            heaterBlock.addEventListener("click", function switchHeaterState() {
-                heaterIsOn = !heaterIsOn;
-                heaterBlock.getElementsByClassName("heater-off")[0].style.opacity = heaterIsOn ? 0 : 1;
-                var body = heaterBlock.getElementsByClassName("block-body")[0];
-                body.innerText = heaterIsOn ? "ON" : "OFF";
-            });
-
             function setBlockValue(blockId, value) {
                 document.getElementById(blockId).getElementsByClassName("block-body")[0].innerHTML = value;
             }
@@ -114,72 +120,63 @@
 
             }
 
-            function fetchTemp() {
-                fetch('temp')
+            function fetchData() {
+                fetch('get_data')
                     .then(function (response) {
                         if (response.status == 200) {
-                            response.text().then(function (tempText) {
-                                setBlockValue("temp", tempText + "&deg;C");
+                            response.text().then(function (data) {
+                                data = JSON.parse(data);
+                                setBlockValue("temp", data["temp"] + "&deg;C");
+                                setBlockValue("humidity", data["humidity"] + "%");
+                                setBlockValue("soil", data["soil"] + "%");
                             });
                         }
                     })
             }
 
-            function fetchCo() {
-                fetch('co')
-                    .then(function (response) {
-                        if (response.status == 200) {
-                            response.text().then(function (coText) {
-                                setCoGradient(coText);
-                                setBlockValue("co", coText + "PPM");
-                            });
-                        }
-                    })
-            }
-
-            function fetchHeater() {
-                fetch('heater')
-                    .then(function (response) {
-                        if (response.status == 200) {
-                            response.text().then(function (heaterText) {
-                                setHeaterGradient(heaterText);
-                                setBlockValue("heater", heaterText == "True" ? "ON" : "OFF");
-                            });
-                        }
-                    })
-            }
-
-            setInterval(function () {
-                /*coLevel += Math.random() * 2 - 1;
-                console.log(coLevel)
-                var coBlock = document.getElementById("co");
-                coBlock.getElementsByClassName("block-body")[0].innerText = ~~coLevel + "PPM";*/
-                fetchTemp();
-                fetchCo();
-                fetchHeater();
-            }, 1000);
+            setInterval(fetchData, 1000);
         });
 
     </script>
 </head>
 
 <body>
-    <div id="main">
+    <div class="block_row">
         <div id="temp" class="block">
             <div class="gradient temp-mid"></div>
             <div class="block-title">Temperature</div>
-            <div class="block-body">20&deg;C</div>
+            <div class="block-body">-</div>
         </div>
-        <div id="co" class="block">
+        <div id="humidity" class="block">
             <div class="gradient co-ok"></div>
             <div class="gradient co-warn"></div>
-            <div class="block-title">CO level</div>
-            <div class="block-body">100PPM</div>
+            <div class="block-title">Humidity level</div>
+            <div class="block-body">-</div>
         </div>
         <div id="heater" class="block">
             <div class="gradient heater-on"></div>
             <div class="gradient heater-off"></div>
-            <div class="block-title ">Heater</div>
+            <div class="block-title ">Light</div>
+            <div class="block-body ">OFF</div>
+        </div>
+    </div>
+    <div class="block_row">
+        <div id="temp" class="block door">
+            <div class="gradient door-open"></div>
+            <div class="gradient door-closed"></div>
+            <div class="block-title">Door</div>
+            <div class="block-body">CLOSED</div>
+        </div>
+        <div id="soil" class="block">
+            <div class="gradient soil-ok"></div>
+            <div class="gradient soil-warn"></div>
+            <div class="block-title">Soil moisture</div>
+            <div class="block-body">-</div>
+        </div>
+        <div id="heater" class="block">
+            <div class="gradient light-on"></div>
+            <div class="gradient light-off"></div>
+            <div class="block-title ">Water pump</div>
             <div class="block-body ">OFF</div>
         </div>
     </div>
