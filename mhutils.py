@@ -31,7 +31,7 @@ def get_last_data_from_address(history, address):
 
 
 def send_transaction(pubkey, privkey, value, to, data):
-    return subprocess.check_output(
+    return subprocess.check_output([
         "python3",
         "metahash.py",
         "send-tx",
@@ -41,4 +41,4 @@ def send_transaction(pubkey, privkey, value, to, data):
         "--value=" + str(value),
         "--to=" + to,
         '--data=' + str(data)
-    ).decode('utf-8')
+    ]).decode('utf-8')

@@ -7,11 +7,13 @@ import json
 import serial
 
 hub_address = mhutils.get_address("keys/hub.pub")
-usb_input = serial.Serial('???', 9600)
+home_address = mhutils.get_address("keys/homr.pub")
+usb_input = serial.Serial('ttyAMX0', 9600)
 
 while True:
     # data = json.dumps(
     #    {"temp": "22.5", "humidity": "100", "soil": "50"})
+    usb_input.flushInput()
     data = usb_input.readline().decode('utf-8')
     pprint(json.loads(data))
     transaction_result = subprocess.check_output([
@@ -26,4 +28,7 @@ while True:
         '--data=' + data
     ]).decode("utf-8")
     print(transaction_result)
-    time.sleep(5)
+
+    history = mhutils.get_history(home_address)
+    last_command = mhutils.get_last_data_from_address(history, hub_address)
+    usb_input.write(last_command + '\n')

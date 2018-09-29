@@ -1,6 +1,6 @@
 import subprocess
 from fabulous.color import bold, blue, green
-from flask import Flask
+from flask import Flask, request
 import time
 from threading import Thread
 import json
@@ -22,7 +22,7 @@ def update_values():
 def background():
     while True:
         update_values()
-        time.sleep(1)
+        time.sleep(0.3)
 
 
 Thread(target=background).start()
@@ -40,6 +40,14 @@ def index():
 @app.route('/get_data')
 def get_data():
     return data
+
+
+@app.route('/send_command')
+def light_on():
+    result = mhutils.send_transaction(
+        'keys/hub.pub', 'keys/hub.priv', 1, home_address, request.args('value'))
+    print(result)
+    return 'OK'
 
 
 app.run()

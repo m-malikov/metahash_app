@@ -61,16 +61,10 @@ void loop() {
   val = analogRead(potpin);            // reads the value of the potentiometer (value between 0 and 1023)
   val = map(val, 0, 1023, 0, 180);     // scale it to use it with the servo (value between 0 and 180)
   //myservo.write(val);                  // sets the servo position according to the scaled value
-  delay(15); 
   
-  digitalWrite(13, HIGH);   // зажигаем светодиод
-  delay(1000);              // ждем секунду
-  digitalWrite(13, LOW);    // выключаем светодиод
-  delay(1000); // ждем секунду
 
   //=========================
   // Wait a few seconds.c_str() between measurements.
-  delay(2000);
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -91,8 +85,18 @@ void loop() {
    // Writing to json
    char jsonData[50];
    sprintf(jsonData, "{\"temp\": %s, \"humidity\": %s, \"soil\": %s}\n", String(t).c_str(), 
-    String(h).c_str(), 
-    String(output_value_soil).c_str());
+   String(h).c_str(), 
+   String(output_value_soil).c_str());
    Serial.print(jsonData);
-   delay(1000);
+
+  // Executing commands
+  String command = Serial.readString();
+  if (command == "LIGHT_ON") {
+    digitalWrite(13, HIGH);
+  } else if (command == "LIGHT_OFF") {
+    digitalWrite(13, LOW);
+  }
+
+   delay(1000); 
 }
+
