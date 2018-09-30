@@ -11,8 +11,6 @@ home_address = mhutils.get_address("keys/temp.pub")
 usb_input = serial.Serial('/dev/ttyACM0', 9600)
 
 while True:
-    # data = json.dumps(
-    #    {"temp": "22.5", "humidity": "100", "soil": "50"})
     usb_input.flushInput()
     data = usb_input.readline().decode('utf-8')
     try:
@@ -37,5 +35,10 @@ while True:
     print(last_command)
     if last_command == 'LIGHT_ON':
         usb_input.write(b'A')
-    if last_command == 'LIGHT_OFF':
+    elif last_command == 'LIGHT_OFF':
         usb_input.write(b'B')
+    elif last_command == 'DOOR_OPEN':
+        usb_input.write(b'C')
+   elif last_command == 'DOOR_CLOSE':
+        usb_input.write(b'D')
+     

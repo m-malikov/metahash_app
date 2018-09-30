@@ -45,7 +45,7 @@ def get_data():
 @app.route('/send_command')
 def light_on():
     result = mhutils.send_transaction(
-        'keys/hub.pub', 'keys/hub.priv', 1, home_address, request.args('value'))
+        'keys/hub.pub', 'keys/hub.priv', 1, home_address, request.args['value'])
     print(result)
     return 'OK'
 

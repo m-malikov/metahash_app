@@ -1,17 +1,3 @@
-/*
-  Зажигаем светодиод на одну секунду, затем выключаем его на  
-  одну  секунду в цикле.
- */
-
- /*
- Controlling a servo position using a potentiometer (variable resistor)
- by Michal Rinott <http://people.interaction-ivrea.it/m.rinott>
-
- modified on 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Knob
-*/
-
 #include <Servo.h>
 
 Servo myservo;  // create servo object to control a servo
@@ -44,59 +30,63 @@ void setup() {
   // Выход 13 на большинстве плат Arduino подключен к светодиоду на плате.
   pinMode(13, OUTPUT);
   myservo.attach(9);  // attaches the servo on pin 9 to the servo object
-
   pinMode(fan, OUTPUT);
   Serial.begin(9600); 
   dht.begin();
   //==================
-
   Serial.begin(9600);
-
-   Serial.println("Reading From the Sensor ...");
-
+  Serial.println("Reading From the Sensor ...");
    delay(2000);
 }
  
 void loop() {
-  val = analogRead(potpin);            // reads the value of the potentiometer (value between 0 and 1023)
-  val = map(val, 0, 1023, 0, 180);     // scale it to use it with the servo (value between 0 and 180)
-  //myservo.write(val);                  // sets the servo position according to the scaled value
-  
-
   //=========================
   // Wait a few seconds.c_str() between measurements.
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
+  delay(1000);
   // Read temperature as Celsius
   float t = dht.readTemperature();
+  delay(1000);
+  int light = 0;
+  int door = 0;
+  
   
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t)) {
-    return;
+    //return;
   }
 
   //=========================
   output_value_soil = analogRead(sensor_pin_soil);
 
    output_value_soil = map(output_value_soil,550,0,0,100);
-   
-   // Writing to json
-   char jsonData[50];
-   sprintf(jsonData, "{\"temp\": %s, \"humidity\": %s, \"soil\": %s}\n", String(t).c_str(), 
-   String(h).c_str(), 
-   String(output_value_soil).c_str());
-   Serial.print(jsonData);
-
+  
   // Executing commands
-  String command = Serial.readString();
-  if (command == "LIGHT_ON") {
+  char command = Serial.read();
+  if (command == 'A') {
+    light = 1;
     digitalWrite(13, HIGH);
-  } else if (command == "LIGHT_OFF") {
+  } else if (command == 'B') {
+    light = 0;
     digitalWrite(13, LOW);
+  } else if (command == 'C') {
+    door = 1;
+    myservo.write(90);
+  } else if (command == 'D') {
+    door = 0;
+    myservo.write(15);
   }
-
-   delay(1000); 
+  // Writing to json
+  char jsonData[256];
+  sprintf(jsonData, "{\"temp\": %s, \"humidity\": %s, \"soil\": %s, \"light\": %s, \"door\": %s}\n", String(t).c_str(), 
+  String(h).c_str(), 
+  String(output_value_soil).c_str(),
+  String(light).c_str(),
+  String(door).c_str());
+  Serial.print(jsonData);
+  delay(500); 
 }
 

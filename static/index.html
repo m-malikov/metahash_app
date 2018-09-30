@@ -58,7 +58,7 @@
             width: 100%;
             height: 100%;
             z-index: -100;
-            transition: opacity 1s;
+            transition: opacity 2s;
         }
 
         .heater-on,
@@ -73,12 +73,12 @@
             background-blend-mode: lighten;
         }
 
-        .co-ok,
+        .humidity-ok,
         .soil-ok {
             background-image: linear-gradient(to top, #37ecba 0%, #72afd3 100%);
         }
 
-        .co-warn,
+        .humidity-warn,
         .soil-warn {
             background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);
         }
@@ -104,19 +104,35 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            var light = false;
+            var door = false;
+
             function setBlockValue(blockId, value) {
                 document.getElementById(blockId).getElementsByClassName("block-body")[0].innerHTML = value;
             }
 
-            function setHeaterGradient(heaterText) {
-                var opacity = heaterText == "True" ? 0 : 1
+            function setLightGradient(data) {
+                var opacity = 1 - data;
                 document.getElementById("heater").getElementsByClassName("heater-off")[0].style.opacity = opacity;
 
             }
 
-            function setCoGradient(coText) {
-                var opacity = +coText < 100 ? 0 : 1
-                document.getElementById("co").getElementsByClassName("co-warn")[0].style.opacity = opacity;
+            function setSoilGradient(value) {
+                var opacity = +value > 0 ? 0 : 1
+                document.getElementById("soil").getElementsByClassName("soil-warn")[0].style.opacity = opacity;
+            }
+
+            function setHumidityGradient(value) {
+                var opacity = +value > 20 ? 0 : 1
+                document.getElementById("humidity").getElementsByClassName("humidity-warn")[0].style.opacity = opacity;
+
+            }
+
+            function setLightGradient() {
+
+            }
+
+            function setDoorGradient() {
 
             }
 
@@ -129,12 +145,22 @@
                                 setBlockValue("temp", data["temp"] + "&deg;C");
                                 setBlockValue("humidity", data["humidity"] + "%");
                                 setBlockValue("soil", data["soil"] + "%");
+                                setHumidityGradient(data["humidity"]);
+                                setSoilGradient(data["soil"]);
+                                setLightGradient(data["light"]);
+                                setDoorGradient(data["door"]);
                             });
                         }
                     })
             }
 
             setInterval(fetchData, 100);
+
+            document.getElementById("light").addEventListener("click", function () {
+                light = !light;
+                setBlockValue("light", light ? "ON" : "OFF");
+                fetch('send_command?value=LIGHT_' + (light ? "ON" : "OFF"));
+            });
         });
 
     </script>
@@ -148,12 +174,12 @@
             <div class="block-body">-</div>
         </div>
         <div id="humidity" class="block">
-            <div class="gradient co-ok"></div>
-            <div class="gradient co-warn"></div>
+            <div class="gradient humidity-ok"></div>
+            <div class="gradient humidity-warn"></div>
             <div class="block-title">Humidity level</div>
             <div class="block-body">-</div>
         </div>
-        <div id="heater" class="block">
+        <div id="light" class="block">
             <div class="gradient heater-on"></div>
             <div class="gradient heater-off"></div>
             <div class="block-title ">Light</div>
@@ -161,7 +187,7 @@
         </div>
     </div>
     <div class="block_row">
-        <div id="temp" class="block door">
+        <div id="door" class="block door">
             <div class="gradient door-open"></div>
             <div class="gradient door-closed"></div>
             <div class="block-title">Door</div>
@@ -173,7 +199,7 @@
             <div class="block-title">Soil moisture</div>
             <div class="block-body">-</div>
         </div>
-        <div id="heater" class="block">
+        <div id="pump" class="block">
             <div class="gradient light-on"></div>
             <div class="gradient light-off"></div>
             <div class="block-title ">Water pump</div>
