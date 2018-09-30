@@ -51,11 +51,13 @@ void loop() {
   float t = dht.readTemperature();
   delay(1000);
   int light = 0;
-  int door = 0;
+  int door = 1;
   
   
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t)) {
+    h = 0;
+    t = 0;
     //return;
   }
 

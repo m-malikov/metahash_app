@@ -113,8 +113,12 @@
 
             function setLightGradient(data) {
                 var opacity = 1 - data;
-                document.getElementById("heater").getElementsByClassName("heater-off")[0].style.opacity = opacity;
+                document.getElementById("light").getElementsByClassName("heater-off")[0].style.opacity = opacity;
+            }
 
+            function setDoorGradient(data) {
+                var opacity = 1 - data;
+                document.getElementById("door").getElementsByClassName("door-closed")[0].style.opacity = opacity;
             }
 
             function setSoilGradient(value) {
@@ -125,14 +129,6 @@
             function setHumidityGradient(value) {
                 var opacity = +value > 20 ? 0 : 1
                 document.getElementById("humidity").getElementsByClassName("humidity-warn")[0].style.opacity = opacity;
-
-            }
-
-            function setLightGradient() {
-
-            }
-
-            function setDoorGradient() {
 
             }
 
@@ -147,6 +143,10 @@
                                 setBlockValue("soil", data["soil"] + "%");
                                 setHumidityGradient(data["humidity"]);
                                 setSoilGradient(data["soil"]);
+                                light = data["light"] == "1";
+                                door = data["door"] == 1
+                                setBlockValue("light", light ? "ON" : "OFF");
+                                setBlockValue("door", door ? "OPEN" : "CLOSED");
                                 setLightGradient(data["light"]);
                                 setDoorGradient(data["door"]);
                             });
@@ -157,9 +157,11 @@
             setInterval(fetchData, 100);
 
             document.getElementById("light").addEventListener("click", function () {
-                light = !light;
-                setBlockValue("light", light ? "ON" : "OFF");
-                fetch('send_command?value=LIGHT_' + (light ? "ON" : "OFF"));
+                fetch('send_command?value=LIGHT_' + (!light ? "ON" : "OFF"));
+            });
+
+            document.getElementById("door").addEventListener("click", function () {
+                fetch('send_command?value=DOOR_' + (!door ? "OPEN" : "CLOSE"));
             });
         });
 
